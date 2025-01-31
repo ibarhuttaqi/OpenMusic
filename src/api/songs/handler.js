@@ -14,13 +14,17 @@ class SongsHandler {
 
   async postSongHandler(request, h) {
     this._validator.validateSongPayload(request.payload);
-    const { title = 'untitled', body, tags } = request.payload;
+    const {
+      title, year, genre, performer, duration, albumId,
+    } = request.payload;
 
-    const songId = await this._service.addSong({ title, body, tags });
+    const songId = await this._service.addSong({
+      title, year, genre, performer, duration, albumId,
+    });
 
     const response = h.response({
       status: 'success',
-      message: 'Catatan berhasil ditambahkan',
+      message: 'Menambahkan lagu',
       data: {
         songId,
       },
@@ -33,6 +37,7 @@ class SongsHandler {
     const songs = await this._service.getSongs();
     return {
       status: 'success',
+      message: 'Mendapatkan seluruh lagu',
       data: {
         songs,
       },
@@ -44,6 +49,7 @@ class SongsHandler {
     const song = await this._service.getSongById(id);
     return {
       status: 'success',
+      message: 'Mendapatkan lagu berdasarkan id',
       data: {
         song,
       },
@@ -58,7 +64,7 @@ class SongsHandler {
 
     return {
       status: 'success',
-      message: 'Catatan berhasil diperbarui',
+      message: 'Mengubah lagu berdasarkan id lagu',
     };
   }
 
@@ -68,7 +74,7 @@ class SongsHandler {
 
     return {
       status: 'success',
-      message: 'Catatan berhasil dihapus',
+      message: 'Menghapus lagu berdasarkan id',
     };
   }
 }
