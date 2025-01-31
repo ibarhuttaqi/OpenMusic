@@ -20,7 +20,7 @@ class AlbumsHandler {
 
     const response = h.response({
       status: 'success',
-      message: 'Album berhasil ditambahkan',
+      message: 'Menambahkan album',
       data: {
         albumId,
       },
@@ -44,6 +44,7 @@ class AlbumsHandler {
     const album = await this._service.getAlbumById(id);
     return {
       status: 'success',
+      message: 'Mendapatkan album berdasarkan id',
       data: {
         album,
       },
@@ -58,7 +59,7 @@ class AlbumsHandler {
 
     return {
       status: 'success',
-      message: 'Catatan berhasil diperbarui',
+      message: 'Mengubah album berdasarkan id album',
     };
   }
 
@@ -68,7 +69,7 @@ class AlbumsHandler {
 
     return {
       status: 'success',
-      message: 'Catatan berhasil dihapus',
+      message: 'Menghapus album berdasarkan id',
     };
   }
 }
