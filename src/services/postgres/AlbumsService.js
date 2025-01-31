@@ -41,7 +41,6 @@ class AlbumsService {
       values: [id],
     };
     const result = await this._pool.query(query);
-    // console.log('sadfasf', result);
 
     if (!result.rows.length) {
       throw new NotFoundError('Album tidak ditemukan');
@@ -54,7 +53,7 @@ class AlbumsService {
   async editAlbumById(id, { name, year }) {
     // const updatedAt = new Date().toISOString();
     const query = {
-      text: 'UPDATE albums SET name = $1, year = $2 WHERE id = $5 RETURNING id',
+      text: 'UPDATE albums SET name = $1, year = $2 WHERE id = $3 RETURNING id',
       values: [name, year, id],
     };
 
