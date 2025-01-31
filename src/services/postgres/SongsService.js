@@ -31,9 +31,31 @@ class SongsService {
     return result.rows[0].id;
   }
 
-  async getSongs() {
-    const result = await this._pool.query('SELECT id, title, performer FROM songs');
-    // return result.rows.map(mapDBToModel);
+  async getSongs({ title, performer }) {
+    let query = 'SELECT id, title, performer FROM songs';
+    const values = [];
+    const conditions = [];
+
+    // Tambahkan kondisi pencarian berdasarkan query parameter
+    if (title) {
+      values.push(`%${title}%`);
+      conditions.push(`title ILIKE $${values.length}`);
+    }
+    if (performer) {
+      values.push(`%${performer}%`);
+      conditions.push(`performer ILIKE $${values.length}`);
+    }
+
+    // Jika ada kondisi pencarian, tambahkan WHERE ke query
+    if (conditions.length > 0) {
+      query += ` WHERE ${conditions.join(' AND ')}`;
+    }
+
+    // console.log('query', query);
+    // console.log('values', values);
+
+    const result = await this._pool.query({ text: query, values });
+
     return result.rows;
   }
 
