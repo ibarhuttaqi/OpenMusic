@@ -106,26 +106,6 @@ class PlaylistsSongsService {
     }
   }
 
-  // async verifyPlaylistOwner(playlistId, userId) {
-  //   const query = {
-  //     // text: 'SELECT playlists_songs.*, playlists.* FROM playlists_songs RIGHT JOIN playlists ON playlists.id = playlists_songs.playlist_id WHERE playlists_songs.playlist_id = $1',
-  //     text: 'SELECT playlists.* FROM playlists JOIN users ON playlists.user_id = users.id WHERE playlists.user_id = $1 AND playlists.id = $2',
-  //     values: [userId, playlistId],
-  //   };
-  //   const result = await this._pool.query(query);
-  //   if (!result.rows.length) {
-  //     throw new NotFoundError('Playlist tidak ditemukan');
-  //   }
-  //   // console.log('result.rows', result.rows);
-  //   const playlist = result.rows[0];
-  //   // console.log('playlist.user_id', playlist.user_id);
-  //   // console.log('userId', userId);
-  //   // console.log(playlist.user_id !== userId);
-  //   if (playlist.user_id !== userId) {
-  //     throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
-  //   }
-  // }
-
   async verifyPlaylistOwner(playlistId, userId) {
     const query = {
       text: 'SELECT * FROM playlists WHERE playlists.id = $1',
@@ -136,11 +116,8 @@ class PlaylistsSongsService {
       throw new NotFoundError('Playlist tidak ditemukan');
     }
 
-    // console.log('result.rows', result.rows);
     const playlist = result.rows[0];
-    // console.log('playlist.user_id', playlist.user_id);
-    // console.log('userId', userId);
-    // console.log(playlist.user_id !== userId);
+
     if (playlist.user_id !== userId) {
       throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
     }
