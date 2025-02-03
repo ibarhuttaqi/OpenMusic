@@ -29,13 +29,16 @@ class PlaylistsService {
     return result.rows[0].id;
   }
 
-  async getPlaylists({ userId }) {
+  async getPlaylists(userId) {
+    // console.log('userId', userId);
     const query = {
       text: 'SELECT playlists.id, playlists.name, users.username FROM playlists JOIN users ON playlists.user_id = users.id WHERE playlists.user_id = $1',
       values: [userId],
     };
+    // console.log('query', query);
 
-    const result = await this._pool.query({ query });
+    const result = await this._pool.query(query);
+    // console.log('cvbcbxcbcxbxb', result.rows);
 
     return result.rows;
   }
@@ -53,17 +56,19 @@ class PlaylistsService {
     }
   }
 
-  async verifyPlaylistOwner(id, userId) {
+  async verifyPlaylistOwner(playlistId, userId) {
     const query = {
       text: 'SELECT * FROM playlists WHERE id = $1',
-      values: [id],
+      values: [playlistId],
     };
     const result = await this._pool.query(query);
     if (!result.rows.length) {
       throw new NotFoundError('Playlist tidak ditemukan');
     }
+
     const playlist = result.rows[0];
-    if (playlist.userId !== userId) {
+
+    if (playlist.user_id !== userId) {
       throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
     }
   }

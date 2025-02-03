@@ -51,6 +51,9 @@ const init = async () => {
         origin: ['*'],
       },
     },
+    // debug: {
+    //   request: ['error'],
+    // },
   });
 
   // registrasi plugin eksternal

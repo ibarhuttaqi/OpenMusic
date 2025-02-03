@@ -31,14 +31,14 @@ const routes = (handler) => [
   //     auth: 'notesapp_jwt',
   //   },
   // },
-  // {
-  //   method: 'DELETE',
-  //   path: '/notes/{id}',
-  //   handler: handler.deleteNoteByIdHandler,
-  //   options: {
-  //     auth: 'notesapp_jwt',
-  //   },
-  // },
+  {
+    method: 'DELETE',
+    path: '/playlists/{playlistId}',
+    handler: handler.deletePlaylistByIdHandler,
+    options: {
+      auth: 'openmusicapp_jwt',
+    },
+  },
 ];
 
 module.exports = routes;

@@ -1,0 +1,1 @@
+truncate albums, songs, users, authentications, playlists, playlists_songs;

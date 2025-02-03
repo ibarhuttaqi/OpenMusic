@@ -2,6 +2,7 @@ const { Pool } = require('pg');
 const { nanoid } = require('nanoid');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
+const AuthorizationError = require('../../exceptions/AuthorizationError');
 
 class PlaylistsSongsService {
   constructor() {
@@ -9,15 +10,22 @@ class PlaylistsSongsService {
   }
 
   async addPlaylistSong({
-    playlistsId, songId,
+    playlistId, songId,
   }) {
+    // Validasi keberadaan song
+    await this.verifySongExistence(songId);
+
     const id = nanoid(16);
 
+    // console.log('playlistsId', playlistId);
+    // console.log('songId', songId);
+
     const query = {
-      text: 'INSERT INTO playlists_songs VALUES($1, $2) RETURNING id',
-      values: [id, playlistsId, songId],
+      text: 'INSERT INTO playlists_songs VALUES($1, $2, $3) RETURNING id',
+      values: [id, playlistId, songId],
     };
 
+    // try {
     const result = await this._pool.query(query);
 
     if (!result.rows[0].id) {
@@ -25,15 +33,19 @@ class PlaylistsSongsService {
     }
 
     return result.rows[0].id;
+    // } catch (error) {
+    // console.log(error);
+    // throw error;
+    // }
   }
 
-  async getPlaylistSongs({ playlistId }) {
+  async getPlaylistSongs(playlistId) {
     const playlistQuery = {
-      text: 'SELECT playlists.id, playlists.name, users.username FROM playlists JOIN users ON playlists.user_id = users.id WHERE playlists.user_id = $1',
+      text: 'SELECT playlists.id, playlists.name, users.username FROM playlists JOIN users ON playlists.user_id = users.id WHERE playlists.id = $1',
       values: [playlistId],
     };
 
-    const playlistResult = await this._pool.query({ playlistQuery });
+    const playlistResult = await this._pool.query(playlistQuery);
 
     if (!playlistResult.rows.length) {
       throw new NotFoundError('Playlist tidak ditemukan');
@@ -44,6 +56,11 @@ class PlaylistsSongsService {
       values: [playlistId],
     };
     const songsResult = await this._pool.query(songsQuery);
+
+    // console.log(playlistResult.rows[0].id);
+    // console.log(playlistResult.rows[0].name);
+    // console.log(playlistResult.rows[0].username);
+    // console.log('songsResult', songsResult.rows);
 
     return {
       id: playlistResult.rows[0].id,
@@ -75,6 +92,72 @@ class PlaylistsSongsService {
 
     if (!result.rows.length) {
       throw new InvariantError('Kolaborasi gagal diverifikasi');
+    }
+  }
+
+  async verifySongExistence(songId) {
+    const query = {
+      text: 'SELECT id FROM songs WHERE id = $1',
+      values: [songId],
+    };
+    const result = await this._pool.query(query);
+    if (!result.rows.length) {
+      throw new NotFoundError('Lagu tidak ditemukan');
+    }
+  }
+
+  // async verifyPlaylistOwner(playlistId, userId) {
+  //   const query = {
+  //     // text: 'SELECT playlists_songs.*, playlists.* FROM playlists_songs RIGHT JOIN playlists ON playlists.id = playlists_songs.playlist_id WHERE playlists_songs.playlist_id = $1',
+  //     text: 'SELECT playlists.* FROM playlists JOIN users ON playlists.user_id = users.id WHERE playlists.user_id = $1 AND playlists.id = $2',
+  //     values: [userId, playlistId],
+  //   };
+  //   const result = await this._pool.query(query);
+  //   if (!result.rows.length) {
+  //     throw new NotFoundError('Playlist tidak ditemukan');
+  //   }
+  //   // console.log('result.rows', result.rows);
+  //   const playlist = result.rows[0];
+  //   // console.log('playlist.user_id', playlist.user_id);
+  //   // console.log('userId', userId);
+  //   // console.log(playlist.user_id !== userId);
+  //   if (playlist.user_id !== userId) {
+  //     throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
+  //   }
+  // }
+
+  async verifyPlaylistOwner(playlistId, userId) {
+    const query = {
+      text: 'SELECT * FROM playlists WHERE playlists.id = $1',
+      values: [playlistId],
+    };
+    const result = await this._pool.query(query);
+    if (!result.rows.length) {
+      throw new NotFoundError('Playlist tidak ditemukan');
+    }
+
+    // console.log('result.rows', result.rows);
+    const playlist = result.rows[0];
+    // console.log('playlist.user_id', playlist.user_id);
+    // console.log('userId', userId);
+    // console.log(playlist.user_id !== userId);
+    if (playlist.user_id !== userId) {
+      throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
+    }
+  }
+
+  async verifyPlaylistAccess(playlistId, userId) {
+    try {
+      await this.verifyPlaylistOwner(playlistId, userId);
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+      // try {
+      //   await this.playlistsSongsService.verifyCollaborator(playlistId, userId);
+      // } catch {
+      //   throw error;
+      // }
     }
   }
 }
