@@ -65,6 +65,18 @@ class PlaylistsSongsService {
       throw new NotFoundError('Lagu dalam Playlist gagal dihapus. Id tidak ditemukan');
     }
   }
+
+  async verifyCollaborator(playlistId, userId) {
+    const query = {
+      text: 'SELECT * FROM playlists_songs JOIN playlists ON playlists.id = playlists_songs.playlist_id WHERE playlists_songs.playlist_id = $1 AND playlists.user_id = $2',
+      values: [playlistId, userId],
+    };
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new InvariantError('Kolaborasi gagal diverifikasi');
+    }
+  }
 }
 
 module.exports = PlaylistsSongsService;

@@ -4,10 +4,10 @@ class PlaylistsHandler {
     this._validator = validator;
 
     this.postPlaylistHandler = this.postPlaylistHandler.bind(this);
-    // this.getNotesHandler = this.getNotesHandler.bind(this);
+    this.getPlaylistsHandler = this.getPlaylistsHandler.bind(this);
     // this.getNoteByIdHandler = this.getNoteByIdHandler.bind(this);
     // this.putNoteByIdHandler = this.putNoteByIdHandler.bind(this);
-    // this.deleteNoteByIdHandler = this.deleteNoteByIdHandler.bind(this);
+    this.deletePlaylistByIdHandler = this.deletePlaylistByIdHandler.bind(this);
   }
 
   async postPlaylistHandler(request, h) {
@@ -30,55 +30,55 @@ class PlaylistsHandler {
     return response;
   }
 
-  async getNotesHandler(request) {
+  async getPlaylistsHandler(request) {
     const { id: credentialId } = request.auth.credentials;
-    const notes = await this._service.getNotes(credentialId);
+    const playlists = await this._service.getPlaylists(credentialId);
     return {
       status: 'success',
       data: {
-        notes,
+        playlists,
       },
     };
   }
 
-  async getNoteByIdHandler(request, h) {
+  // async getNoteByIdHandler(request, h) {
+  //   const { id } = request.params;
+  //   const { id: credentialId } = request.auth.credentials;
+  //   await this._service.verifyNoteAccess(id, credentialId);
+
+  //   const note = await this._service.getNoteById(id);
+  //   return {
+  //     status: 'success',
+  //     data: {
+  //       note,
+  //     },
+  //   };
+  // }
+
+  // async putNoteByIdHandler(request, h) {
+  //   this._validator.validateNotePayload(request.payload);
+  //   const { id } = request.params;
+  //   const { id: credentialId } = request.auth.credentials;
+  //   await this._service.verifyNoteAccess(id, credentialId);
+
+  //   await this._service.editNoteById(id, request.payload);
+
+  //   return {
+  //     status: 'success',
+  //     message: 'Catatan berhasil diperbarui',
+  //   };
+  // }
+
+  async deletePlaylistByIdHandler(request, h) {
     const { id } = request.params;
     const { id: credentialId } = request.auth.credentials;
-    await this._service.verifyNoteAccess(id, credentialId);
+    await this._service.verifyPlaylistOwner(id, credentialId);
 
-    const note = await this._service.getNoteById(id);
-    return {
-      status: 'success',
-      data: {
-        note,
-      },
-    };
-  }
-
-  async putNoteByIdHandler(request, h) {
-    this._validator.validateNotePayload(request.payload);
-    const { id } = request.params;
-    const { id: credentialId } = request.auth.credentials;
-    await this._service.verifyNoteAccess(id, credentialId);
-
-    await this._service.editNoteById(id, request.payload);
+    await this._service.deletePlaylistById(id);
 
     return {
       status: 'success',
-      message: 'Catatan berhasil diperbarui',
-    };
-  }
-
-  async deleteNoteByIdHandler(request, h) {
-    const { id } = request.params;
-    const { id: credentialId } = request.auth.credentials;
-    await this._service.verifyNoteOwner(id, credentialId);
-
-    await this._service.deleteNoteById(id);
-
-    return {
-      status: 'success',
-      message: 'Catatan berhasil dihapus',
+      message: 'Playlist berhasil dihapus',
     };
   }
 }
