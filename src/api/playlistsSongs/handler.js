@@ -4,10 +4,10 @@ class PlaylistsSongsHandler {
     this._validator = validator;
 
     this.postPlaylistSongHandler = this.postPlaylistSongHandler.bind(this);
-    // this.getNotesHandler = this.getNotesHandler.bind(this);
+    this.getPlaylistSongsHandler = this.getPlaylistSongsHandler.bind(this);
     // this.getNoteByIdHandler = this.getNoteByIdHandler.bind(this);
     // this.putNoteByIdHandler = this.putNoteByIdHandler.bind(this);
-    // this.deleteNoteByIdHandler = this.deleteNoteByIdHandler.bind(this);
+    this.deletePlaylistSongByIdHandler = this.deletePlaylistSongByIdHandler.bind(this);
   }
 
   async postPlaylistSongHandler(request, h) {
