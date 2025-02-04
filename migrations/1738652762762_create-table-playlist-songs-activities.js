@@ -8,7 +8,34 @@ exports.shorthands = undefined;
  * @param run {() => void | undefined}
  * @returns {Promise<void> | void}
  */
-exports.up = (pgm) => {};
+exports.up = (pgm) => {
+  pgm.createTable('playlist_songs_activities', {
+    id: {
+      type: 'VARCHAR(50)',
+      primaryKey: true,
+    },
+    playlist_id: {
+      type: 'VARCHAR(50)',
+      notNull: true,
+    },
+    song_id: {
+      type: 'VARCHAR(50)',
+      notNull: true,
+    },
+    user_id: {
+      type: 'VARCHAR(50)',
+      notNull: true,
+    },
+    action: {
+      type: 'TEXT',
+      notNull: true,
+    },
+    time: {
+      type: 'TEXT',
+      notNull: true,
+    },
+  });
+};
 
 /**
  * @param pgm {import('node-pg-migrate').MigrationBuilder}

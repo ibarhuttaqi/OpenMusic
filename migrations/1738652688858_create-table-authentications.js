@@ -8,7 +8,14 @@ exports.shorthands = undefined;
  * @param run {() => void | undefined}
  * @returns {Promise<void> | void}
  */
-exports.up = (pgm) => {};
+exports.up = (pgm) => {
+  pgm.createTable('authentications', {
+    token: {
+      type: 'TEXT',
+      notNull: true,
+    },
+  });
+};
 
 /**
  * @param pgm {import('node-pg-migrate').MigrationBuilder}
