@@ -5,8 +5,9 @@ const NotFoundError = require('../../exceptions/NotFoundError');
 const AuthorizationError = require('../../exceptions/AuthorizationError');
 
 class PlaylistsSongsService {
-  constructor() {
+  constructor(collaborationService) {
     this._pool = new Pool();
+    this._collaborationService = collaborationService;
   }
 
   async addPlaylistSong({
@@ -75,18 +76,6 @@ class PlaylistsSongsService {
     }
   }
 
-  async verifyCollaborator(playlistId, userId) {
-    const query = {
-      text: 'SELECT * FROM playlists_songs JOIN playlists ON playlists.id = playlists_songs.playlist_id WHERE playlists_songs.playlist_id = $1 AND playlists.user_id = $2',
-      values: [playlistId, userId],
-    };
-    const result = await this._pool.query(query);
-
-    if (!result.rows.length) {
-      throw new InvariantError('Kolaborasi gagal diverifikasi');
-    }
-  }
-
   async verifySongExistence(songId) {
     const query = {
       text: 'SELECT id FROM songs WHERE id = $1',
@@ -122,11 +111,11 @@ class PlaylistsSongsService {
       if (error instanceof NotFoundError) {
         throw error;
       }
-      // try {
-      //   await this.playlistsSongsService.verifyCollaborator(playlistId, userId);
-      // } catch {
-      //   throw error;
-      // }
+      try {
+        await this._collaborationService.verifyCollaborator(playlistId, userId);
+      } catch {
+        throw error;
+      }
     }
   }
 }

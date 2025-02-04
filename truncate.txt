@@ -1,1 +1,1 @@
-truncate albums, songs, users, authentications, playlists, playlists_songs;
+truncate albums, songs, users, authentications, playlists, playlists_songs, collaborations;

@@ -5,9 +5,10 @@ const NotFoundError = require('../../exceptions/NotFoundError');
 const AuthorizationError = require('../../exceptions/AuthorizationError');
 
 class PlaylistsService {
-  constructor(playlistsSongsService) {
+  constructor(playlistsSongsService, collaborationsService) {
     this._pool = new Pool();
-    this.playlistsSongsService = playlistsSongsService;
+    this._playlistsSongsService = playlistsSongsService;
+    this._collaborationsService = collaborationsService;
   }
 
   async addPlaylist({
@@ -32,7 +33,11 @@ class PlaylistsService {
   async getPlaylists(userId) {
     // console.log('userId', userId);
     const query = {
-      text: 'SELECT playlists.id, playlists.name, users.username FROM playlists JOIN users ON playlists.user_id = users.id WHERE playlists.user_id = $1',
+      text: `SELECT playlists.id, playlists.name, users.username 
+        FROM playlists 
+        JOIN users ON playlists.user_id = users.id 
+        LEFT JOIN collaborations ON collaborations.playlist_id = playlists.id
+        WHERE playlists.user_id = $1 OR collaborations.user_id = $1`,
       values: [userId],
     };
     // console.log('query', query);
@@ -81,10 +86,21 @@ class PlaylistsService {
         throw error;
       }
       try {
-        await this.playlistsSongsService.verifyCollaborator(playlistId, userId);
+        await this._collaborationsService.verifyCollaborator(playlistId, userId);
       } catch {
         throw error;
       }
+    }
+  }
+
+  async verifyUserExistence(userId) {
+    const query = {
+      text: 'SELECT id FROM users WHERE id = $1',
+      values: [userId],
+    };
+    const result = await this._pool.query(query);
+    if (!result.rows.length) {
+      throw new NotFoundError('User tidak ditemukan');
     }
   }
 }
