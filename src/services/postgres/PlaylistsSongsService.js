@@ -17,9 +17,6 @@ class PlaylistsSongsService {
 
     const id = nanoid(16);
 
-    // console.log('playlistsId', playlistId);
-    // console.log('songId', songId);
-
     const query = {
       text: 'INSERT INTO playlists_songs VALUES($1, $2, $3) RETURNING id',
       values: [id, playlistId, songId],
@@ -56,11 +53,6 @@ class PlaylistsSongsService {
       values: [playlistId],
     };
     const songsResult = await this._pool.query(songsQuery);
-
-    // console.log(playlistResult.rows[0].id);
-    // console.log(playlistResult.rows[0].name);
-    // console.log(playlistResult.rows[0].username);
-    // console.log('songsResult', songsResult.rows);
 
     return {
       id: playlistResult.rows[0].id,
