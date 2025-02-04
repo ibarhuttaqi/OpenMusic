@@ -47,10 +47,8 @@ class PlaylistSongsActivitiesService {
         WHERE playlist_songs_activities.playlist_id = $1`,
       values: [playlistId],
     };
-    // console.log('query', query);
 
     const result = await this._pool.query(query);
-    // console.log('cvbcbxcbcxbxb', result.rows);
 
     return result.rows;
   }

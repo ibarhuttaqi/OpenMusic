@@ -31,7 +31,6 @@ class PlaylistsService {
   }
 
   async getPlaylists(userId) {
-    // console.log('userId', userId);
     const query = {
       text: `SELECT playlists.id, playlists.name, users.username 
         FROM playlists 
@@ -40,10 +39,8 @@ class PlaylistsService {
         WHERE playlists.user_id = $1 OR collaborations.user_id = $1`,
       values: [userId],
     };
-    // console.log('query', query);
 
     const result = await this._pool.query(query);
-    // console.log('cvbcbxcbcxbxb', result.rows);
 
     return result.rows;
   }

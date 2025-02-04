@@ -2,7 +2,6 @@ const { Pool } = require('pg');
 const { nanoid } = require('nanoid');
 const bcrypt = require('bcrypt');
 const InvariantError = require('../../exceptions/InvariantError');
-const NotFoundError = require('../../exceptions/NotFoundError');
 const AuthenticationError = require('../../exceptions/AuthenticationError');
 
 class UsersService {
@@ -11,9 +10,9 @@ class UsersService {
   }
 
   async addUser({ username, password, fullname }) {
-    // TODO: Verifikasi username, pastikan belum terdaftar.
+    // Verifikasi username, pastikan belum terdaftar.
     await this.verifyNewUsername(username);
-    // TODO: Bila verifikasi lolos, maka masukkan user baru ke database.
+    // Bila verifikasi lolos, maka masukkan user baru ke database.
     const id = `user-${nanoid(16)}`;
     const hashedPassword = await bcrypt.hash(password, 10);
     const query = {
@@ -42,21 +41,6 @@ class UsersService {
     }
   }
 
-  //   async getUserById(userId) {
-  //     const query = {
-  //       text: 'SELECT id, username, fullname FROM users WHERE id = $1',
-  //       values: [userId],
-  //     };
-
-  //     const result = await this._pool.query(query);
-
-  //     if (!result.rows.length) {
-  //       throw new NotFoundError('User tidak ditemukan');
-  //     }
-
-  //     return result.rows[0];
-  //   }
-
   async verifyUserCredential(username, password) {
     const query = {
       text: 'SELECT id, password FROM users WHERE username = $1',
@@ -77,15 +61,6 @@ class UsersService {
     }
     return id;
   }
-
-//   async getUsersByUsername(username) {
-//     const query = {
-//       text: 'SELECT id, username, fullname FROM users WHERE username LIKE $1',
-//       values: [`%${username}%`],
-//     };
-//     const result = await this._pool.query(query);
-//     return result.rows;
-//   }
 }
 
 module.exports = UsersService;

@@ -48,13 +48,6 @@ class PlaylistsSongsHandler {
     await this._playlistsSongsService.verifyPlaylistAccess(playlistId, credentialId);
     const playlist = await this._playlistsSongsService.getPlaylistSongs(playlistId);
 
-    // console.log({
-    //   status: 'success',
-    //   data: {
-    //     playlists,
-    //   },
-    // });
-
     return {
       status: 'success',
       data: {
@@ -63,7 +56,7 @@ class PlaylistsSongsHandler {
     };
   }
 
-  async deletePlaylistSongByIdHandler(request, h) {
+  async deletePlaylistSongByIdHandler(request) {
     this._validator.validatePlaylistSongPayload(request.payload);
     const { playlistId } = request.params;
     const { songId } = request.payload;

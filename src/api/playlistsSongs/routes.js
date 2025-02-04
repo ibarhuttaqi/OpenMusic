@@ -15,22 +15,6 @@ const routes = (handler) => [
       auth: 'openmusicapp_jwt',
     },
   },
-  // {
-  //   method: 'GET',
-  //   path: '/notes/{id}',
-  //   handler: handler.getNoteByIdHandler,
-  //   options: {
-  //     auth: 'notesapp_jwt',
-  //   },
-  // },
-  // {
-  //   method: 'PUT',
-  //   path: '/notes/{id}',
-  //   handler: handler.putNoteByIdHandler,
-  //   options: {
-  //     auth: 'notesapp_jwt',
-  //   },
-  // },
   {
     method: 'DELETE',
     path: '/playlists/{playlistId}/songs',

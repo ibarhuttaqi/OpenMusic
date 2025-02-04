@@ -5,9 +5,9 @@ const NotFoundError = require('../../exceptions/NotFoundError');
 const AuthorizationError = require('../../exceptions/AuthorizationError');
 
 class PlaylistsSongsService {
-  constructor(collaborationService) {
+  constructor(collaborationsService) {
     this._pool = new Pool();
-    this._collaborationService = collaborationService;
+    this._collaborationsService = collaborationsService;
   }
 
   async addPlaylistSong({
@@ -23,7 +23,6 @@ class PlaylistsSongsService {
       values: [id, playlistId, songId],
     };
 
-    // try {
     const result = await this._pool.query(query);
 
     if (!result.rows[0].id) {
@@ -31,10 +30,6 @@ class PlaylistsSongsService {
     }
 
     return result.rows[0].id;
-    // } catch (error) {
-    // console.log(error);
-    // throw error;
-    // }
   }
 
   async getPlaylistSongs(playlistId) {
@@ -112,7 +107,7 @@ class PlaylistsSongsService {
         throw error;
       }
       try {
-        await this._collaborationService.verifyCollaborator(playlistId, userId);
+        await this._collaborationsService.verifyCollaborator(playlistId, userId);
       } catch {
         throw error;
       }
