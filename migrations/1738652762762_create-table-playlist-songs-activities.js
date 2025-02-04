@@ -35,6 +35,12 @@ exports.up = (pgm) => {
       notNull: true,
     },
   });
+
+  pgm.addConstraint(
+    'playlist_songs_activities',
+    'playlists_id',
+    'FOREIGN KEY(playlist_id) REFERENCES playlists(id) ON DELETE CASCADE',
+  );
 };
 
 /**

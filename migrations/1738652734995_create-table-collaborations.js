@@ -23,6 +23,18 @@ exports.up = (pgm) => {
       notNull: true,
     },
   });
+
+  pgm.addConstraint(
+    'collaborations',
+    'playlist_id',
+    'FOREIGN KEY(playlist_id) REFERENCES playlists(id) ON DELETE CASCADE',
+  );
+
+  pgm.addConstraint(
+    'collaborations',
+    'user_id',
+    'FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE',
+  );
 };
 
 /**
