@@ -1,5 +1,5 @@
 node_modules
 .env
 .prod.env
-truncate
+truncate.txt
 src/api/uploads/file

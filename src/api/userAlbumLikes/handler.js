@@ -4,15 +4,20 @@ class AlbumsHandler {
     this._validator = validator;
 
     this.postUserAlbumLikeHandler = this.postUserAlbumLikeHandler.bind(this);
-    this.getAlbumByIdHandler = this.getAlbumByIdHandler.bind(this);
-    this.deleteAlbumByIdHandler = this.deleteAlbumByIdHandler.bind(this);
+    this.getUserAlbumLikesHandler = this.getUserAlbumLikesHandler.bind(this);
+    this.deleteUserAlbumLikeByIdHandler = this.deleteUserAlbumLikeByIdHandler.bind(this);
   }
 
   async postUserAlbumLikeHandler(request, h) {
     const { id: credentialId } = request.auth.credentials;
     const { albumId } = request.params;
 
-    const userAlbumLikeId = await this._service.addUserAlbumLike({ credentialId, albumId });
+    const userAlbumLikeId = await this._service.addUserAlbumLike(
+      {
+        userId: credentialId,
+        albumId,
+      },
+    );
 
     const response = h.response({
       status: 'success',
@@ -37,9 +42,9 @@ class AlbumsHandler {
   }
 
   async deleteUserAlbumLikeByIdHandler(request) {
-    // const { id: credentialId } = request.auth.credentials;
+    const { id: credentialId } = request.auth.credentials;
     const { albumId } = request.params;
-    await this._service.deleteUserAlbumLikeById(albumId);
+    await this._service.deleteUserAlbumLikeById(credentialId, albumId);
 
     return {
       status: 'success',
