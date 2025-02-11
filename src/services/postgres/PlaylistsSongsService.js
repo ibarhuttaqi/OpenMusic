@@ -40,7 +40,7 @@ class PlaylistsSongsService {
 
     const playlistResult = await this._pool.query(playlistQuery);
 
-    if (!playlistResult.rows.length) {
+    if (!playlistResult.rowCount) {
       throw new NotFoundError('Playlist tidak ditemukan');
     }
 
@@ -66,7 +66,7 @@ class PlaylistsSongsService {
 
     const result = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError('Lagu dalam Playlist gagal dihapus. Id tidak ditemukan');
     }
   }
@@ -77,7 +77,7 @@ class PlaylistsSongsService {
       values: [songId],
     };
     const result = await this._pool.query(query);
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError('Lagu tidak ditemukan');
     }
   }
@@ -88,7 +88,7 @@ class PlaylistsSongsService {
       values: [playlistId],
     };
     const result = await this._pool.query(query);
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError('Playlist tidak ditemukan');
     }
 

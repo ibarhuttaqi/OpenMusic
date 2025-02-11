@@ -35,7 +35,7 @@ class PlaylistSongsActivitiesService {
       values: [playlistId],
     };
     const playlistResult = await this._pool.query(playlistQuery);
-    if (!playlistResult.rows.length) {
+    if (!playlistResult.rowCount) {
       throw new NotFoundError('Playlist tidak ditemukan');
     }
 
@@ -59,7 +59,7 @@ class PlaylistSongsActivitiesService {
       values: [playlistId],
     };
     const result = await this._pool.query(query);
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError('Playlist tidak ditemukan');
     }
 
