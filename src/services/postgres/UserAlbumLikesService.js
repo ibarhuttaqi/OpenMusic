@@ -5,8 +5,9 @@ const NotFoundError = require('../../exceptions/NotFoundError');
 const ClientError = require('../../exceptions/ClientError');
 
 class UserAlbumLikesService {
-  constructor() {
+  constructor(cacheService) {
     this._pool = new Pool();
+    this._cacheService = cacheService;
   }
 
   async addUserAlbumLike({ userId, albumId }) {
@@ -39,31 +40,46 @@ class UserAlbumLikesService {
       values: [id, userId, albumId],
     };
 
-    try {
-      const result = await this._pool.query(query);
-      if (!result.rows[0].id) {
-        throw new InvariantError('Like gagal ditambahkan');
-      }
+    const result = await this._pool.query(query);
 
-      return result.rows[0].id;
-    } catch (error) {
-      console.log('error : ', error);
-      return error;
+    if (!result.rows[0].id) {
+      throw new InvariantError('Like gagal ditambahkan');
     }
+
+    await this._cacheService.delete(`likes:${albumId}`);
+
+    return result.rows[0].id;
   }
 
   async getUserAlbumLikes(albumId) {
-    const UserAlbumLikesQuery = {
-      text: 'SELECT CAST(COUNT(*) AS INTEGER) FROM user_album_likes WHERE album_id = $1',
-      values: [albumId],
-    };
-    const UserAlbumLikesResult = await this._pool.query(UserAlbumLikesQuery);
+    try {
+      const cacheResult = await this._cacheService.get(`likes:${albumId}`);
 
-    if (!UserAlbumLikesResult.rowCount) {
-      throw new NotFoundError('Belum ada yang menyukai album ini');
+      return {
+        isCache: true,
+        result: JSON.parse(cacheResult),
+      };
+    } catch (error) {
+      const UserAlbumLikesQuery = {
+        text: 'SELECT CAST(COUNT(*) AS INTEGER) FROM user_album_likes WHERE album_id = $1',
+        values: [albumId],
+      };
+      const UserAlbumLikesResult = await this._pool.query(UserAlbumLikesQuery);
+
+      if (!UserAlbumLikesResult.rowCount) {
+        throw new NotFoundError('Belum ada yang menyukai album ini');
+      }
+
+      const result = UserAlbumLikesResult.rows[0].count;
+
+      // catatan akan disimpan pada cache sebelum fungsi getNotes dikembalikan
+      await this._cacheService.set(`likes:${albumId}`, result);
+
+      return {
+        isCache: false,
+        result,
+      };
     }
-
-    return UserAlbumLikesResult.rows[0].count;
   }
 
   async deleteUserAlbumLikeById(userId, albumId) {
@@ -77,6 +93,8 @@ class UserAlbumLikesService {
     if (!result.rowCount) {
       throw new NotFoundError('Like gagal dihapus. Id tidak ditemukan');
     }
+
+    await this._cacheService.delete(`likes:${albumId}`);
   }
 }
 
