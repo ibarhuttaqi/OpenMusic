@@ -34,6 +34,13 @@ exports.up = (pgm) => {
     'album_id',
     'FOREIGN KEY(album_id) REFERENCES albums(id) ON DELETE CASCADE',
   );
+
+  // Tambah UNIQUE constraint untuk memastikan satu user hanya bisa like satu kali per album
+  pgm.addConstraint(
+    'user_album_likes',
+    'unique_user_album_like',
+    'UNIQUE(user_id, album_id)',
+  );
 };
 
 /**
@@ -41,4 +48,6 @@ exports.up = (pgm) => {
  * @param run {() => void | undefined}
  * @returns {Promise<void> | void}
  */
-exports.down = (pgm) => {};
+exports.down = (pgm) => {
+  pgm.dropTable('user_album_likes');
+};
